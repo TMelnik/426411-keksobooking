@@ -1,5 +1,23 @@
 'use strict';
 
+//задание 1
+
+// генерация случайного числа в диапазоне от минимального до максимального
+function getRandom(min, max) {
+    return Math.round(min - 0.5 + Math.random() * (max - min + 1));
+}
+
+//генерация случайного значения из массива
+function getRendomElement(array){
+  return array[Math.floor(Math.random()*array.length)];
+}
+
+// генерация случайного массива строк
+function getArray(array){
+
+}
+
+// массивы значений
 var AVATAR = [
   'img/avatars/user01.png',
   'img/avatars/user02.png',
@@ -9,7 +27,7 @@ var AVATAR = [
   'img/avatars/user06.png',
   'img/avatars/user07.png',
   'img/avatars/user08.png'
-]
+];
 
 var TITLE = [
   'Большая уютная квартира',
@@ -20,37 +38,20 @@ var TITLE = [
   'Некрасивый негостеприимный домик',
   'Уютное бунгало далеко от моря',
   'Неуютное бунгало по колено в воде'
-]
-
-var ADDRESS = [
-  "600, 350",
-  "500, 250",
-  "100, 150",
-  "200, 350",
-  "300, 100",
-  "400, 50",
-  "500, 60",
-  "600, 90"
-]
-
-var prise = Math.floor(Math.random() * 1000000) + 1000;
+];
 
 var TYPE = [
   'palace',
   'flat',
   'house',
   'bungalo'
-]
-
-var rooms = Math.floor(Math.random() * 5) + 1;
-
-var guests = Math.floor(Math.random() * 10) + 1;
+];
 
 var CHECKIN, CHECKOUT = [
   '12:00',
   '13:00',
   '14:00'
-]
+];
 
 var FEATURES = [
   'wifi',
@@ -59,46 +60,47 @@ var FEATURES = [
   'washer',
   'elevator',
   'conditioner'
-]
-
-var description = '';
+];
 
 var PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
-]
+];
 
-var locationX = Math.floor(Math.random() * 900) + 300;
-var locationY = Math.floor(Math.random() * 500) + 150;
+var bookings = [];
+
+for (var i =0; i < 8; i++){
+  var booking = [
+    {
+      `avatar`: getRendomElement(AVATAR)
+    },
+    {
+      'offer':{
+        'title': getRendomElement(TITLE),
+        'address': getRandom(300, 900) + getRandom(150, 500),
+        'prise': getRandom(1000, 1000000),
+        'type': getRendomElement(TYPE),
+        'rooms': getRandom(1, 5),
+        'guests': getRandom(1, 10),
+        'checkIn': getRendomElement(CHECKIN),
+        'checkOut': getRendomElement(CHECKOUT),
+        'features': getArray(FEATURES),
+        'description': '',
+        'photos': getRendomElement(PHOTOS);
+        },
+      'location': {
+        'x': getRandom(300, 900),
+        'y': getRandom(150, 500)
+      }
+    }
+  ]
+  bookings[i] = booking;
+}
+
+// задание 2
 
 var map = document.querySelector('.map');
 userDialog.classList.remove('.map-faded');
 
-function getRendomElement(array){
-  var index = Math.floor(Math.random()*array.length);
-  return array[index];
-}
-
-var object = {};
-
-for (var i =0; i < 8; i++){
-  var objectFiller = {};
-
-  objectFiller.avatar = getRendomElement(AVATAR);
-  objectFiller.title = getRendomElement(TITLE);
-  objectFiller.adsress =getRendomElement(ADDRESS);
-  objectFiller.flatPrise = prise;
-  objectFiller.etype = getRendomElement(TYPE);
-  objectFiller.numberRooms = rooms;
-  objectFiller.numberGuests = guests;
-  objectFiller.timeCheckin = getRendomElement(CHECKIN);
-  objectFiller.timeCheckout = getRendomElement(CHECKOUT);
-  objectFiller.features = getRendomElement(FEATURES);
-  objectFiller.aboutPlace = description;
-  objectFiller.photos = getRendomElement(PHOTOS);
-  objectFiller.locationX = getRendomElement(locationX);
-  objectFiller.locationY = getRendomElement(locationY);
-
-  object[i] = objectFiller;
-}
+// задание 3
