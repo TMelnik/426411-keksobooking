@@ -14,12 +14,12 @@ function getRendomElement(array){
 
 // генерация случайного массива строк
 function getUniqueValue(arrayValues) {
-  return arrayValues.splice(randomInteger(0, arrayValues.length - 1), 1)[0];
+  return arrayValues.splice(getRandom(0, arrayValues.length - 1), 1)[0];
 }
 
 function getRandomArray(arrayValues) {
   var sourceValues = arrayValues.slice();
-  var randomArrayLength = randomInteger(1, sourceValues.length);
+  var randomArrayLength = getRandom(1, sourceValues.length);
   var newArray = [];
   for (var i = 0; i < randomArrayLength; i++) {
     newArray[i] = getUniqueValue(sourceValues);
@@ -101,18 +101,18 @@ for (var i =0; i < 8; i++){
 
   bookings [i] = {
       'author': {
-        'avatar': 'img/avatars/user' + getRendomElement(AVATAR) + '.png'
+        'avatar': getRendomElement(AVATAR)
         },
       'offer':{
         'title': getRendomElement(TITLE),
         'address': addrX + "," + addrY,
-        'prise': getRandom(1000, 1000000),
+        'price': getRandom(1000, 1000000),
         'type': getRendomElement(TYPE),
         'rooms': getRandom(1, 5),
         'guests': getRandom(1, 10),
         'checkIn': getRendomElement(BOOK_TIME),
         'checkOut': getRendomElement(BOOK_TIME),
-        'features': getRandomArrayy(FEATURES),
+        'features': getRandomArray(FEATURES),
         'description': '',
         'photos': getRandomArray(PHOTOS)
         },
@@ -127,16 +127,18 @@ for (var i =0; i < 8; i++){
 // задание 3 и 4
 var mapPin = document.querySelector('.map__pins');
 //var mapPinTempele = document.querySelector('template').content.querySelector('.map__pin');
-var mapCardTempele = document.querySelector('template').content.querySelector('.map__card');
+var template = document.querySelector('template').content;
+var mapCardTemplate = template.querySelector('.map__card');
+var pinTemplate = template.querySelector('.map__pin');
 
 for (var i = 0; i < 8; i++){
-   var template = mapCardTempele.cloneNode(true);
+   var templatePin = pinTemplate.cloneNode(true);
    var fragment = document.createDocumentFragment();
 
-   template.setAttribute('style', 'left: ' + (bookings[i].location.x - PIN_WIDTH / 2) + 'px; top: ' + (bookings[i].location.y - PIN_HEIGHT) + 'px');
-   template.querySelector('img').setAttribute('src', bookings[i].author.avatar);
+   templatePin.setAttribute('style', 'left: ' + (bookings[i].location.x - PIN_WIDTH / 2) + 'px; top: ' + (bookings[i].location.y - PIN_HEIGHT) + 'px');
+   templatePin.querySelector('img').setAttribute('src', bookings[i].author.avatar);
 
-   fragment.appendChild(template);
+   fragment.appendChild(templatePin);
    mapPin.appendChild(fragment);
 }
 //задание 5
@@ -145,7 +147,7 @@ var elementParent = document.querySelector('.map');
 var element = document.createElement('div');
 
 element.className = 'new_map__card';
-elementParent.insertBefore(element, elemntBefore);
+elementParent.insertBefore(element, elementBefore);
 
 var articleTemplatePopup = document.querySelector('template').content.querySelector('article.map__card');
 
@@ -154,7 +156,7 @@ function renderPopup(someBooking) {
 //вывести заголовок обьявления
   articlePopup.querySelector('.popup__title').textContent = someBooking.offer.title;
 //вывести адрес
-  articlePopup.querySelector('.popup__text--address.').textContent = someBooking.offer.address;
+  articlePopup.querySelector('.popup__text--address').textContent = someBooking.offer.address;
 //вывести цена
   articlePopup.querySelector('.popup__text--price').textContent = someBooking.offer.price + '₽/ночь';
 //тип жилья
@@ -162,7 +164,7 @@ function renderPopup(someBooking) {
 //количество гостей и комнат
   articlePopup.querySelector('.popup__text--capacity').textContent = someBooking.offer.rooms + ' комнаты для ' + someBooking.offer.guests + ' гостей';
 //время заезда и выезда
-  articlePopup.querySelector('.popup__text--time').textContent = 'Заезд после ' + someBooking.offer.checkin + ', выезд до ' + someBooking.offer.checkout;
+  articlePopup.querySelector('.popup__text--time').textContent = 'Заезд после ' + someBooking.offer.checkIn + ', выезд до ' + someBooking.offer.checkOut;
 //доступные удобства
 var articlePopupFeatures = articlePopup.querySelector('.popup__features');
 
@@ -170,28 +172,34 @@ for (i = 0; i < 6; i++) {
  articlePopupFeatures.removeChild(articlePopup.querySelector('li'));
 }
 
-for (i = 0; i < someBook.offer.features.length; i++) {
+for (i = 0; i < someBooking.offer.features.length; i++) {
  var li = document.createElement('li');
- li.className = 'feature feature--' + someBook.offer.features[i];
+ li.className = 'feature feature--' + someBooking.offer.features[i];
  articlePopupFeatures.appendChild(li);
 }
 //описание
-  articlePopup.querySelector('popup__description').textContent = someBooking.offer.description;
+  articlePopup.querySelector('.popup__description').textContent = someBooking.offer.description;
 //фотографии
   var photoPopup = articlePopup.querySelector('.popup__photos');
+  //задаем пустое содержимое элементу
+  photoPopup.innerHTML = " ";
+
+  var imgPopupFragment = document.createDocumentFragment();
 
   for (i = 0; i < someBooking.offer.photos.length; i++) {
-    var photoCopy = photoPopup.querySelector('li').cloneNode(true);
-    photoPopup.appendChild(photoCopy);
-    photoPopup.querySelector('img').setAttribute('src', someBooking.offer.photos[i]);
+    var imgPopupElement = document.createElement('img');
+    imgPopupElement.setAttribute('src', someBooking.offer.photos[i]);
+    imgPopupElement.setAttribute('width', '45px');
+    imgPopupElement.setAttribute('heigth', '40px');
+    imgPopupFragment.appendChild(imgPopupElement);
   }
-//аватар
-    var avatar = articlePopup.querySelector('.popup__avatar');
-    articlePopup.querySelector('img').setAttribute('src',someBooking.author.avatar);
+  photoPopup.appendChild(imgPopupFragment);
 
+//аватар
+    articlePopup.querySelector('img').setAttribute('src',someBooking.author.avatar);
     return articlePopup;
 }
 
 var fragmentPopup = document.createDocumentFragment();
 fragmentPopup.appendChild(renderPopup(bookings[0]));
-elem.appendChild(fragmentPopup);
+element.appendChild(fragmentPopup);
