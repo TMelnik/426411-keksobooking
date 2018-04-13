@@ -93,19 +93,19 @@ var map = document.querySelector('.map');
 map.classList.remove('map--faded');
 
 //задание 1-->
-var booking = [];
+var bookings = [];
 
 for (var i =0; i < 8; i++){
   var addrX = getRandom(300, 900);
   var addrY = getRandom(150, 500);
 
-  booking [i] = {
+  bookings [i] = {
       'author': {
         'avatar': 'img/avatars/user' + getRendomElement(AVATAR) + '.png'
         },
       'offer':{
         'title': getRendomElement(TITLE),
-        'address': getRandom(300, 900) + getRandom(150, 500),
+        'address': addrX + "," + addrY,
         'prise': getRandom(1000, 1000000),
         'type': getRendomElement(TYPE),
         'rooms': getRandom(1, 5),
@@ -114,33 +114,35 @@ for (var i =0; i < 8; i++){
         'checkOut': getRendomElement(BOOK_TIME),
         'features': getRandomArrayy(FEATURES),
         'description': '',
-        'photos': getRendomElement(PHOTOS)
+        'photos': getRandomArray(PHOTOS)
         },
       'location': {
         'x': addrX,
         'y': addrY
         }
     };
-  }
+}
+
 
 // задание 3 и 4
-var mapPin = map.querySelector('.map__pin');
-var mapPinTampele = document.querySelector('template').content.querySelector('.map__card');
+var mapPin = document.querySelector('.map__pins');
+//var mapPinTempele = document.querySelector('template').content.querySelector('.map__pin');
+var mapCardTempele = document.querySelector('template').content.querySelector('.map__card');
 
-template.setAttribute('style', 'left: ' + (bookings[i].location.x - PIN_WIDTH / 2) + 'px; top: ' + (bookings[i].location.y - PIN_HEIGHT) + 'px');
-template.querySelector('img').setAttribute('src', bookings[i].author.avatar);
-
-
-for (var i = 0; i < bookings.length; i++){
-   var element = mapPinTampele.cloneNode(true);
+for (var i = 0; i < 8; i++){
+   var template = mapCardTempele.cloneNode(true);
    var fragment = document.createDocumentFragment();
-   fragment.appendChild(element);
+
+   template.setAttribute('style', 'left: ' + (bookings[i].location.x - PIN_WIDTH / 2) + 'px; top: ' + (bookings[i].location.y - PIN_HEIGHT) + 'px');
+   template.querySelector('img').setAttribute('src', bookings[i].author.avatar);
+
+   fragment.appendChild(template);
    mapPin.appendChild(fragment);
 }
 //задание 5
-var elemntBefore = document.querySelector('.map__filters-container');
-var elemntParent = document.querySelector('.map');
-var elemnt = document.createElement('div');
+var elementBefore = document.querySelector('.map__filters-container');
+var elementParent = document.querySelector('.map');
+var element = document.createElement('div');
 
 element.className = 'new_map__card';
 elementParent.insertBefore(element, elemntBefore);
@@ -152,7 +154,7 @@ function renderPopup(someBooking) {
 //вывести заголовок обьявления
   articlePopup.querySelector('.popup__title').textContent = someBooking.offer.title;
 //вывести адрес
-  articlePopup.querySelector('.popup__text--address').textContent = someBooking.offer.address;
+  articlePopup.querySelector('.popup__text--address.').textContent = someBooking.offer.address;
 //вывести цена
   articlePopup.querySelector('.popup__text--price').textContent = someBooking.offer.price + '₽/ночь';
 //тип жилья
@@ -162,9 +164,19 @@ function renderPopup(someBooking) {
 //время заезда и выезда
   articlePopup.querySelector('.popup__text--time').textContent = 'Заезд после ' + someBooking.offer.checkin + ', выезд до ' + someBooking.offer.checkout;
 //доступные удобства
-  articlePopup.querySelectorAll('.popup__features').textContent = someBooking.features.address;
+var articlePopupFeatures = articlePopup.querySelector('.popup__features');
+
+for (i = 0; i < 6; i++) {
+ articlePopupFeatures.removeChild(articlePopup.querySelector('li'));
+}
+
+for (i = 0; i < someBook.offer.features.length; i++) {
+ var li = document.createElement('li');
+ li.className = 'feature feature--' + someBook.offer.features[i];
+ articlePopupFeatures.appendChild(li);
+}
 //описание
-  articlePopup.querySelector('.popup__description').textContent = someBooking.offer.description;
+  articlePopup.querySelector('popup__description').textContent = someBooking.offer.description;
 //фотографии
   var photoPopup = articlePopup.querySelector('.popup__photos');
 
@@ -174,10 +186,12 @@ function renderPopup(someBooking) {
     photoPopup.querySelector('img').setAttribute('src', someBooking.offer.photos[i]);
   }
 //аватар
+    var avatar = articlePopup.querySelector('.popup__avatar');
     articlePopup.querySelector('img').setAttribute('src',someBooking.author.avatar);
+
     return articlePopup;
 }
 
 var fragmentPopup = document.createDocumentFragment();
-fragmentPopup.appendChild(renderPopup(book[0]));
+fragmentPopup.appendChild(renderPopup(bookings[0]));
 elem.appendChild(fragmentPopup);
