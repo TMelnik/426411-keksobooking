@@ -91,6 +91,7 @@ function getRandomArray(arrayValues) {
 var map = document.querySelector('.map');
 map.classList.remove('map--faded');
 
+
 // задание 1-->
 
 var getBooking = function () {
@@ -134,22 +135,20 @@ var template = document.querySelector('template').content;
 var pinTemplate = template.querySelector('.map__pin');
 
 var putPin = function () {
-
+  var fragment = document.createDocumentFragment();
   for (var i = 0; i < 8; i++) {
     var templatePin = pinTemplate.cloneNode(true);
-    var fragment = document.createDocumentFragment();
-
     templatePin.setAttribute('style', 'left: ' + (bookings[i].location.x - PIN_WIDTH / 2) + 'px; top: ' + (bookings[i].location.y - PIN_HEIGHT) + 'px');
     templatePin.querySelector('img').setAttribute('src', bookings[i].author.avatar);
-
     fragment.appendChild(templatePin);
-    mapPin.appendChild(fragment);
   }
+  mapPin.appendChild(fragment);
 }
 
 putPin();
 
 // задание 5
+
 var elementBefore = document.querySelector('.map__filters-container');
 var elementParent = document.querySelector('.map');
 var element = document.createElement('div');
@@ -157,7 +156,7 @@ var element = document.createElement('div');
 element.className = 'new_map__card';
 elementParent.insertBefore(element, elementBefore);
 
-var articleTemplatePopup = document.querySelector('template').content.querySelector('article.map__card');
+var articleTemplatePopup = template.querySelector('article.map__card');
 
 function renderPopup(someBooking) {
   var articlePopup = articleTemplatePopup.cloneNode(true);
@@ -175,16 +174,15 @@ function renderPopup(someBooking) {
   articlePopup.querySelector('.popup__text--time').textContent = 'Заезд после ' + someBooking.offer.checkIn + ', выезд до ' + someBooking.offer.checkOut;
   // доступные удобства
   var articlePopupFeatures = articlePopup.querySelector('.popup__features');
+  articlePopupFeatures.innerHTML = ' ';
 
-  for (var i = 0; i < 6; i++) {
-    articlePopupFeatures.removeChild(articlePopup.querySelector('li'));
-  }
-
+  var fragmentLi = document.createDocumentFragment();
   for (var j = 0; j < someBooking.offer.features.length; j++) {
     var li = document.createElement('li');
     li.className = 'feature feature--' + someBooking.offer.features[j];
-    articlePopupFeatures.appendChild(li);
+    fragmentLi.appendChild(li);
   }
+  articlePopupFeatures.appendChild(fragmentLi);
   // описание
   articlePopup.querySelector('.popup__description').textContent = someBooking.offer.description;
   // фотографии
@@ -211,3 +209,7 @@ function renderPopup(someBooking) {
 var fragmentPopup = document.createDocumentFragment();
 fragmentPopup.appendChild(renderPopup(bookings[0]));
 element.appendChild(fragmentPopup);
+
+// module4-task1
+
+
