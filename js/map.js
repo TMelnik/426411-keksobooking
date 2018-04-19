@@ -59,6 +59,7 @@ var PHOTOS = [
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 
+
 // задание 1-->
 
 // генерация случайного числа в диапазоне от минимального до максимального
@@ -143,9 +144,8 @@ var putPin = function () {
     fragment.appendChild(templatePin);
   }
   mapPin.appendChild(fragment);
-}
+};
 
-putPin();
 
 // задание 5
 
@@ -203,13 +203,47 @@ function renderPopup(someBooking) {
 
   // аватар
   articlePopup.querySelector('img').setAttribute('src', someBooking.author.avatar);
-  return articlePopup;
+  // return articlePopup;
+
+  var fragmentPopup = document.createDocumentFragment();
+
+  if (element.querySelector('article.map__card')) {
+    element.querySelector('article.map__card').remove();
+  }
+
+  fragmentPopup.appendChild(renderPopup(bookings[0]));
+  element.appendChild(fragmentPopup);
 }
 
-var fragmentPopup = document.createDocumentFragment();
-fragmentPopup.appendChild(renderPopup(bookings[0]));
-element.appendChild(fragmentPopup);
+
+putPin();
 
 // module4-task1
 
+
+var pinMap = document.querySelector('.map__pin--main');
+var address = document.getElementById('address');
+
+pinMap.addEventListener('mouseup', function () {
+  map.classList.remove('map--faded');
+  document.querySelector('.notice__form').classList.remove('notice__form--disabled');
+  document.querySelector('.notice__form').removeAttribute('disabled');
+  var newAddressLeft = pinMap.offsetLeft - PIN_WIDTH / 2;
+  var newAddressTop = pinMap.offsetTop + PIN_HEIGHT / 2;
+  address.setAttribute('value', newAddressLeft + ', ' + newAddressTop);
+
+});
+
+var parentPin = document.querySelector('.map__pins');
+parentPin.addEventListener('click', function (evt) {
+
+  var targetPin = evt.target;
+  if (targetPin.tagName === 'IMG') {
+    targetPin = targetPin.parentElement;
+  }
+
+  if (targetPin.dataset.pinId !== void 0) {
+    renderPopup(getBooking[parseInt(targetPin.dataset.pinId, 10)]);
+  }
+});
 
