@@ -58,6 +58,7 @@ var PHOTOS = [
 
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var ESC_KEYCODE = 27;
 
 
 // задание 1-->
@@ -146,15 +147,15 @@ var putPin = function () {
   mapPin.appendChild(fragment);
 };
 
+putPin();
 
 // задание 5
 
 var elementBefore = document.querySelector('.map__filters-container');
-var elementParent = document.querySelector('.map');
 var element = document.createElement('div');
 
 element.className = 'new_map__card';
-elementParent.insertBefore(element, elementBefore);
+map.insertBefore(element, elementBefore);
 
 var articleTemplatePopup = template.querySelector('article.map__card');
 
@@ -203,7 +204,6 @@ function renderPopup(someBooking) {
 
   // аватар
   articlePopup.querySelector('img').setAttribute('src', someBooking.author.avatar);
-  // return articlePopup;
 
   var fragmentPopup = document.createDocumentFragment();
 
@@ -211,46 +211,99 @@ function renderPopup(someBooking) {
     element.querySelector('article.map__card').remove();
   }
 
-  fragmentPopup.appendChild(renderPopup(bookings[0]));
+  fragmentPopup.appendChild(articlePopup);
   element.appendChild(fragmentPopup);
+
+  return articlePopup;
 }
 
 
-putPin();
-
 // module4-task1
 
+// Карта Pin Main
+var mapPinMain = document.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+var popup = document.querySelector('.popup');
+var popupClose = document.querySelector('.popup__close');
 
-var pinMap = document.querySelector('.map__pin--main');
-var address = document.getElementById('address');
+// Отключите все поля, настроив «disabled» на теги fieldset
+var noticeFormFieldsets = noticeForm.querySelectorAll('fieldset');
+noticeFormFieldsets.forEach(function (elem) {
+  elem.disabled = true;
+});
 
-pinMap.addEventListener('mouseup', function () {
+var hideElement = function (target) {
+  target.classList.add('hidden');
+};
+
+var showElement = function (target) {
+  target.classList.remove('hidden');
+};
+
+var removeActivePins = function (arr) {
+  arr.forEach(function (elem) {
+    elem.classList.remove('map__pin--active');
+  });
+};
+
+var onPopupEscPress = function (e) {
+  if (e.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+// Найти все контакты за исключением основного
+var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+mapPins.forEach(function (elem) {
+  hideElement(elem);
+});
+
+// Скрыть всплывающее окно по умолчанию
+hideElement(popup);
+
+// Активировать карту
+var activateMap = function () {
+  // показать карту
   map.classList.remove('map--faded');
-  document.querySelector('.notice__form').classList.remove('notice__form--disabled');
-  document.querySelector('.notice__form').removeAttribute('disabled');
-  var newAddressLeft = pinMap.offsetLeft - PIN_WIDTH / 2;
-  var newAddressTop = pinMap.offsetTop + PIN_HEIGHT / 2;
-  address.setAttribute('value', newAddressLeft + ', ' + newAddressTop);
 
-});
+  // активировать форму увидомления
+  noticeForm.classList.remove('notice__form--disabled');
 
-var parentPin = document.querySelector('.map__pins');
-parentPin.addEventListener('click', function (evt) {
+  // сделать все поля ативными
+  noticeFormFieldsets.forEach(function (elem) {
+    elem.disabled = false;
+  });
 
-  var targetPin = evt.target;
-  if (targetPin.tagName === 'IMG') {
-    targetPin = targetPin.parentElement;
-  }
+  /*
+   * Показать все маркеры
+   * Показать всплывающее окно
+   * добавить активный класс для маркеров карты по щелчку
+  */
+  mapPins.forEach(function (elem, i) {
+    showElement(elem);
 
-  if (targetPin.dataset.pinId !== void 0) {
-    renderPopup(getBooking[parseInt(targetPin.dataset.pinId, 10)]);
-  }
+    elem.addEventListener('click', function () {
+      removeActivePins(mapPins);
+      showElement(popup);
+      elem.classList.add('map__pin--active');
+      renderPopup(i);
+      document.addEventListener('keydown', onPopupEscPress);
+    });
+  });
+};
 
-  var articlePopupAll = document.querySelectorAll('article.map__card');
-  if (articlePopupAll.length >= 2) {
-    articlePopupAll[0].remove();
-  }
-});
+// Активировать карту на кнопке мыши
+mapPinMain.addEventListener('mouseup', activateMap);
 
+/*
+ * Закрыть всплывающее окно
+  * удалить все активные контакты
+  * удалить прослушиватель onPopupEscPress
+ */
+var closePopup = function () {
+  hideElement(popup);
+  removeActivePins(mapPins);
 
-
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+popupClose.addEventListener('click', closePopup);
